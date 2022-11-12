@@ -16,8 +16,6 @@ struct node{
 };
 
 class AVL{
-//   private:
-    // struct node *root;
   public:
     struct node *root;
     AVL(){
@@ -160,37 +158,37 @@ class AVL{
 
     }
 
-    void levelorder_newline(){
+    void printTree(){
         if (this->root == NULL){
             cout<<"\n"<<"Empty tree"<<"\n";
             return;            
         }
-        levelorder_newline(this->root);
+        printTree(this->root);
     }
 
-    void levelorder_newline(struct node *v){
+    void printTree(struct node *v){
         queue <struct node *> q;
-        struct node *cur;
+        struct node *curr;
         q.push(v);
         q.push(NULL);      
 
         while(!q.empty()){
-            cur = q.front();
+            curr = q.front();
             q.pop();
-            if(cur == NULL && q.size()!=0){
+            if(!curr && q.size()!=0){
                 cout<<"\n";
                 
                 q.push(NULL);
                 continue;
             }
-            if(cur!=NULL){
-                cout<<" "<<cur->data;
+            if(curr){
+                cout<<" "<<curr->data;
 
-                if (cur->left!=NULL){
-                q.push(cur->left);
+                if (curr->left){
+                q.push(curr->left);
                 }
-                if (cur->right!=NULL){
-                    q.push(cur->right);
+                if (curr->right){
+                    q.push(curr->right);
                 }
             }
             
@@ -199,9 +197,7 @@ class AVL{
     }
  
     struct node * deleteNode(struct node *root,int data){
-        // cout<<root->data<<" "<<data<<endl;
         if(!root->left && !root->right){
-            // cout<<"Inside first if"<<endl;
             if(root==this->root)
                 this->root = NULL;
             delete root;
@@ -230,7 +226,6 @@ class AVL{
         }
 
         root->height=findHeight(root);
-        // cout<<"After height"<<endl;
 
         if(balFactor(root)==2 && balFactor(root->left)==1){ root = llRotation(root); }                  
         else if(balFactor(root)==2 && balFactor(root->left)==-1){ root = lrRotation(root); }
@@ -238,13 +233,11 @@ class AVL{
         else if(balFactor(root)==-2 && balFactor(root->right)==1){ root = rrRotation(root); }
         else if(balFactor(root)==-2 && balFactor(root->right)==-1){ root = rlRotation(root); }
         else if(balFactor(root)==-2 && balFactor(root->right)==0){ root = rrRotation(root); }
-        // cout<<"After rotation"<<endl;
         
         return root;
     }
 
     struct node* inorderPred(struct node* root){
-        // cout<<"insdie pred"<<endl;
         while(root->right!=NULL)
             root = root->right;
 
@@ -356,7 +349,7 @@ int main(int argc, char **argv){
     if (inputfile.is_open()){
         while (getline(inputfile, line)){
             
-            printf("\n---------------------------------------\n");
+            cout<<"\n---------------------------------------\n";
             char* buffer = strdup(line.c_str());
             char command[20];
             int key1, key2;
@@ -370,14 +363,14 @@ int main(int argc, char **argv){
             else{
                 operations(command, key1, key2, &obj, outputfile);
             }
-            obj.levelorder_newline();
+            obj.printTree();
             free(buffer);
         }
         inputfile.close();
         
     }
     else {
-        std::cout << "Unable to open input file \n";
+        std::cout << "Unable to open input file"<<endl;
     }
     outputfile.close();
 }
