@@ -253,6 +253,27 @@ class AVL{
 
         return root;    
     }
+
+    struct node* searchNode(struct node* root, int data){
+        if(!root) return NULL;
+        if(data>root->data) return searchNode(root->right, data);
+        else if(data<root->data) return searchNode(root->left, data);
+        else return root;
+
+        return root;    
+    }
+
+    void searchNode(struct node* root, int start, int end, vector<struct node*>& nodes){
+        if(!root || start>end) return;
+        // if(root->data>=start && root->data<=end){
+        //     nodes.push_back(root);
+        // }
+        if(root->data>start) searchNode(root->left,start,end,nodes);
+        if(root->data>=start && root->data<=end){
+            nodes.push_back(root);
+        }
+        if(root->data<end) searchNode(root->right,start,end,nodes);
+    }
     
 
     ~AVL(){
@@ -276,6 +297,7 @@ int main(){
         cout<<"\n1.Display levelorder on newline";
         cout<<"\n2.Insert";
         cout<<"\n3.Delete\n";
+        cout<<"\n4.Search\n";
         cout<<"\n0.Exit\n";
         cout<<"\nChoice: ";
 
@@ -288,7 +310,9 @@ int main(){
         //     obj.levelorder_newline();
         //     // to print the tree in level order
         //     break;
-                  
+        case 0:
+            break;  
+
         case 1:
             cout<<"\nEnter no. ";
             cin>>x;
@@ -302,9 +326,37 @@ int main(){
             obj.root = obj.deleteNode(obj.root,x);
             obj.levelorder_newline();
             break;
-            
-        case 0:
+        
+        case 3:
+            cout<<"\nWhat to search? ";
+            cin>>x;
+            struct node* temp;
+            temp = obj.searchNode(obj.root,x);
+            if(temp) cout<<"Search key present - "<<temp->data<<endl;
+            else cout<<"Search key not found"<<endl;
             break;
+
+        case 4:
+            cout<<"Enter range - ";
+            int start,end;
+            cin>>start;
+            cin>>end;
+            vector<struct node *> nodes;
+            obj.searchNode(obj.root,start,end,nodes);
+            if(nodes.size()!=0){
+                cout<<"Nodes within the search range are - ";
+                for(int i=0;i<nodes.size();i++){
+                    cout<<nodes[i]->data<<" ";
+                }
+                cout<<endl;
+            }
+            else{
+                cout<<"There are no nodes within the search range"<<endl;
+            }
+            break;
+            
+        // case 0:
+        //     break;
         }
 
      } while(c!=0);
