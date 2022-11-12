@@ -7,8 +7,8 @@ using namespace std;
 struct node{
     int data;
     int height;
-    struct node* left=NULL;
-    struct node* right=NULL;
+    struct node* left;
+    struct node* right;
 };
 
 class AVL{
@@ -32,19 +32,21 @@ class AVL{
             else if(!root->left && root->right){
                return root->right->height + 1;
             }
-            else return 0;
+            else return 1;
     }
 
     int balFactor(struct node *root){       //gives the balance factor of a node in the tree
-            if(root->left && root->right){
-                return root->left->height - root->right->height; 
-            }
-            else if(root->left && !root->right){
-                return root->left->height; 
-            }
-            else if(!root->left && root->right ){
-                return -1 * root->right->height;
-            }
+        if(!root) return 0;
+        if(root->left && root->right){
+            return root->left->height - root->right->height; 
+        }
+        else if(root->left && !root->right){
+            return root->left->height; 
+        }
+        else if(!root->left && root->right ){
+            return -1 * root->right->height;
+        }
+        else return 0;
     }
 
     struct node * llRotation(struct node *root){
@@ -55,6 +57,8 @@ class AVL{
         pl = p->left;
         p->left = pl->right;
         pl->right = p;
+        p->height=findHeight(p);
+        pl->height=findHeight(pl);
 
         return pl; 
     }
@@ -69,6 +73,8 @@ class AVL{
 
         p->right = pr->left;
         pr->left = p;
+        p->height=findHeight(p);
+        pr->height=findHeight(pr);
 
         return pr; 
     }
@@ -86,7 +92,10 @@ class AVL{
         p->right = prl->left;
         pr->left = prl->right;
         prl->left = p;
-        prl->right = pr; 
+        prl->right = pr;
+        p->height=findHeight(p);
+        pr->height=findHeight(pr);
+        prl->height=findHeight(prl);
         
         return prl; 
     }
@@ -104,6 +113,9 @@ class AVL{
         pl->right = plr->left;
         plr->left = pl; 
         plr->right = p;
+        p->height=findHeight(p);
+        pl->height=findHeight(pl);
+        plr->height=findHeight(plr);
         
         return plr; 
     }
@@ -142,7 +154,7 @@ class AVL{
 
         return root;
 
-        }
+    }
 
     void levelorder_newline(){
         if (this->root == NULL){
@@ -182,58 +194,64 @@ class AVL{
         }
     }
  
-    struct node * deleteNode(struct node *p,int data){
-
-        if(p->left == NULL && p->right == NULL){
-                if(p==this->root)
-                    this->root = NULL;
-            delete p;
+    struct node * deleteNode(struct node *root,int data){
+        cout<<root->data<<" "<<data<<endl;
+        if(!root->left && !root->right){
+            cout<<"Inside first if"<<endl;
+            if(root==this->root)
+                this->root = NULL;
+            delete root;
             return NULL;
         }
 
         struct node *t;
         struct node *q;
-        if(p->data < data){
-            p->right = deleteNode(p->right,data);
+        if(data > root->data){
+            root->right = deleteNode(root->right,data);
         }
-        else if(p->data > data){
-            p->left = deleteNode(p->left,data);
+        else if(data < root->data){
+            root->left = deleteNode(root->left,data);
         }
         else{
-            if(p->left != NULL){
-                q = inpre(p->left);
-                p->data = q->data;
-                p->left=deleteNode(p->left,q->data);
+            if(root->left){
+                q = inorderPred(root->left);
+                root->data = q->data;
+                root->left=deleteNode(root->left,q->data);
             }
             else{
-                q = insuc(p->right);
-                p->data = q->data;
-                p->right = deleteNode(p->right,q->data);
+                q = inorderSucc(root->right);
+                root->data = q->data;
+                root->right = deleteNode(root->right,q->data);
             }
         }
 
-        if(balFactor(p)==2 && balFactor(p->left)==1){ p = llRotation(p); }                  
-        else if(balFactor(p)==2 && balFactor(p->left)==-1){ p = lrRotation(p); }
-        else if(balFactor(p)==2 && balFactor(p->left)==0){ p = llRotation(p); }
-        else if(balFactor(p)==-2 && balFactor(p->right)==-1){ p = rrRotation(p); }
-        else if(balFactor(p)==-2 && balFactor(p->right)==1){ p = rlRotation(p); }
-        else if(balFactor(p)==-2 && balFactor(p->right)==0){ p = llRotation(p); }
+        root->height=findHeight(root);
+        cout<<"After height"<<endl;
 
+        if(balFactor(root)==2 && balFactor(root->left)==1){ root = llRotation(root); }                  
+        else if(balFactor(root)==2 && balFactor(root->left)==-1){ root = lrRotation(root); }
+        else if(balFactor(root)==2 && balFactor(root->left)==0){ root = llRotation(root); }
+        else if(balFactor(root)==-2 && balFactor(root->right)==1){ root = rrRotation(root); }
+        else if(balFactor(root)==-2 && balFactor(root->right)==-1){ root = rlRotation(root); }
+        else if(balFactor(root)==-2 && balFactor(root->right)==0){ root = rrRotation(root); }
+        cout<<"After rotation"<<endl;
         
-        return p;
+        return root;
     }
 
-     struct node* inpre(struct node* p){
-        while(p->right!=NULL)
-            p = p->right;
-        return p;    
+    struct node* inorderPred(struct node* root){
+        cout<<"insdie pred"<<endl;
+        while(root->right!=NULL)
+            root = root->right;
+
+        return root;    
     }
 
-    struct node* insuc(struct node* p){
-        while(p->left!=NULL)
-            p = p->left;
+    struct node* inorderSucc(struct node* root){
+        while(root->left!=NULL)
+            root = root->left;
 
-        return p;    
+        return root;    
     }
     
 
@@ -246,6 +264,14 @@ int main(){
     AVL obj;
     int c,x;
 
+    // while(true){
+    //     cout<<endl<<endl;
+    //     cout<<"Enter"<<endl;
+    //     cin>>x;
+    //     obj.root = obj.insert(obj.root,x);
+    //     obj.levelorder_newline();
+
+    // }
     do{
         cout<<"\n1.Display levelorder on newline";
         cout<<"\n2.Insert";
@@ -255,23 +281,26 @@ int main(){
 
         cin>>c;
 
+
         switch (c)
         {
-        case 1:
-            obj.levelorder_newline();
-            // to print the tree in level order
-            break;
+        // case 1:
+        //     obj.levelorder_newline();
+        //     // to print the tree in level order
+        //     break;
                   
-        case 2:
+        case 1:
             cout<<"\nEnter no. ";
             cin>>x;
             obj.root = obj.insert(obj.root,x);
+            obj.levelorder_newline();
             break;
         
-        case 3:
+        case 2:
             cout<<"\nWhat to delete? ";
             cin>>x;
             obj.root = obj.deleteNode(obj.root,x);
+            obj.levelorder_newline();
             break;
             
         case 0:
