@@ -1,6 +1,10 @@
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <queue>
 #include <unordered_map>
+#include <fstream>
+#include <regex>
 
 using namespace std;
 
@@ -195,9 +199,9 @@ class AVL{
     }
  
     struct node * deleteNode(struct node *root,int data){
-        cout<<root->data<<" "<<data<<endl;
+        // cout<<root->data<<" "<<data<<endl;
         if(!root->left && !root->right){
-            cout<<"Inside first if"<<endl;
+            // cout<<"Inside first if"<<endl;
             if(root==this->root)
                 this->root = NULL;
             delete root;
@@ -226,7 +230,7 @@ class AVL{
         }
 
         root->height=findHeight(root);
-        cout<<"After height"<<endl;
+        // cout<<"After height"<<endl;
 
         if(balFactor(root)==2 && balFactor(root->left)==1){ root = llRotation(root); }                  
         else if(balFactor(root)==2 && balFactor(root->left)==-1){ root = lrRotation(root); }
@@ -234,13 +238,13 @@ class AVL{
         else if(balFactor(root)==-2 && balFactor(root->right)==1){ root = rrRotation(root); }
         else if(balFactor(root)==-2 && balFactor(root->right)==-1){ root = rlRotation(root); }
         else if(balFactor(root)==-2 && balFactor(root->right)==0){ root = rrRotation(root); }
-        cout<<"After rotation"<<endl;
+        // cout<<"After rotation"<<endl;
         
         return root;
     }
 
     struct node* inorderPred(struct node* root){
-        cout<<"insdie pred"<<endl;
+        // cout<<"insdie pred"<<endl;
         while(root->right!=NULL)
             root = root->right;
 
@@ -265,9 +269,6 @@ class AVL{
 
     void searchNode(struct node* root, int start, int end, vector<struct node*>& nodes){
         if(!root || start>end) return;
-        // if(root->data>=start && root->data<=end){
-        //     nodes.push_back(root);
-        // }
         if(root->data>start) searchNode(root->left,start,end,nodes);
         if(root->data>=start && root->data<=end){
             nodes.push_back(root);
@@ -281,83 +282,99 @@ class AVL{
     }
 };
 
-int main(){
-    AVL obj;
-    int c,x;
 
-    // while(true){
-    //     cout<<endl<<endl;
-    //     cout<<"Enter"<<endl;
-    //     cin>>x;
-    //     obj.root = obj.insert(obj.root,x);
-    //     obj.levelorder_newline();
+void searchTwoKey(int start, int end, AVL *obj, std::ofstream& outputfile){
+    printf("Search range %d %d\n", start, end);
+    vector<struct node *> nodes;
+    obj->searchNode(obj->root,start,end,nodes);
 
-    // }
-    do{
-        cout<<"\n1.Display levelorder on newline";
-        cout<<"\n2.Insert";
-        cout<<"\n3.Delete\n";
-        cout<<"\n4.Search\n";
-        cout<<"\n0.Exit\n";
-        cout<<"\nChoice: ";
+    if (outputfile.is_open()){
+        if (nodes.size() == 0) {
+            outputfile << "NULL";
+        }
+        else{
+            for(int i = 0; i < nodes.size(); i++){
+                cout<<nodes[i]->data<<" ";
+                outputfile << nodes[i]->data;
+                if (i < nodes.size()-1) {outputfile<<',';}
+            }
+            cout<<endl;
+        }
+        outputfile<<endl;
+    }
+    else cout << "Unable to open output file";
+}
 
-        cin>>c;
-
-
-        switch (c)
-        {
-        // case 1:
-        //     obj.levelorder_newline();
-        //     // to print the tree in level order
-        //     break;
-        case 0:
-            break;  
-
-        case 1:
-            cout<<"\nEnter no. ";
-            cin>>x;
-            obj.root = obj.insert(obj.root,x);
-            obj.levelorder_newline();
-            break;
-        
-        case 2:
-            cout<<"\nWhat to delete? ";
-            cin>>x;
-            obj.root = obj.deleteNode(obj.root,x);
-            obj.levelorder_newline();
-            break;
-        
-        case 3:
-            cout<<"\nWhat to search? ";
-            cin>>x;
-            struct node* temp;
-            temp = obj.searchNode(obj.root,x);
-            if(temp) cout<<"Search key present - "<<temp->data<<endl;
-            else cout<<"Search key not found"<<endl;
-            break;
-
-        case 4:
-            cout<<"Enter range - ";
-            int start,end;
-            cin>>start;
-            cin>>end;
-            vector<struct node *> nodes;
-            obj.searchNode(obj.root,start,end,nodes);
-            if(nodes.size()!=0){
-                cout<<"Nodes within the search range are - ";
-                for(int i=0;i<nodes.size();i++){
-                    cout<<nodes[i]->data<<" ";
-                }
-                cout<<endl;
+void operations(char* comm, int key1, int key2, AVL *obj, std::ofstream& outputfile){
+    string command = comm;
+    if (command.compare("Insert") == 0){
+        cout<<"Insert "<<key1<<endl;
+        obj->root = obj->insert(obj->root,key1);
+    }
+    else if (command.compare("Delete") == 0){
+        cout<<"Delete "<<key1<<endl;
+        obj->root = obj->deleteNode(obj->root,key1);
+    }
+    else if (command.compare("Search") == 0){
+        cout<<"Search "<<key1<<endl;
+        struct node* res;
+        res = obj->searchNode(obj->root,key1);
+        if(outputfile.is_open()){
+            if(res){
+                outputfile << res->data;
+                outputfile << endl;
             }
             else{
-                cout<<"There are no nodes within the search range"<<endl;
+                outputfile << "NULL";
+                outputfile << endl;
             }
-            break;
-            
-        // case 0:
-        //     break;
         }
+        else cout << "Unable to open output file";
 
-     } while(c!=0);
+    } 
+    else printf("This operation is not defined");
+}
+
+int main(int argc, char **argv){
+
+    ifstream inputfile (argv[1]);
+    // ifstream inputfile ("input.txt");
+    ofstream outputfile ("output_file.txt");
+    string line;
+    
+    // Initialize
+    getline(inputfile, line);
+    char* buffer = strdup(line.c_str());
+    char command[20];
+    std::sscanf(buffer, "%[a-zA-Z]()", command);
+    AVL obj;
+    cout<<command<<" AVL Tree"<<endl;
+
+    if (inputfile.is_open()){
+        while (getline(inputfile, line)){
+            
+            printf("\n---------------------------------------\n");
+            char* buffer = strdup(line.c_str());
+            char command[20];
+            int key1, key2;
+            std::sscanf(buffer, "%[a-zA-Z] (%d, %d)", command, &key1, &key2);
+            
+            // Search using two keys
+            if(std::regex_match (line, std::regex("Search[ ]*\\([0-9]*,[ ]*[0-9]*\\)") )){
+                searchTwoKey(key1, key2, &obj, outputfile);
+            }
+            // For other operations
+            else{
+                operations(command, key1, key2, &obj, outputfile);
+            }
+            obj.levelorder_newline();
+            free(buffer);
+        }
+        inputfile.close();
+        
+    }
+    else {
+        std::cout << "Unable to open input file \n";
+    }
+    outputfile.close();
 }
