@@ -293,6 +293,7 @@ void searchTwoKey(int start, int end, AVL *obj, std::ofstream& outputfile){
             outputfile << "NULL";
         }
         else{
+            cout<<"Result - ";
             for(int i = 0; i < nodes.size(); i++){
                 cout<<nodes[i]->data<<" ";
                 outputfile << nodes[i]->data;
@@ -321,10 +322,12 @@ void operations(char* comm, int key1, int key2, AVL *obj, std::ofstream& outputf
         res = obj->searchNode(obj->root,key1);
         if(outputfile.is_open()){
             if(res){
+                cout<<"Found key - "<<res->data<<endl;
                 outputfile << res->data;
                 outputfile << endl;
             }
             else{
+                cout<<"Key not found"<<endl;
                 outputfile << "NULL";
                 outputfile << endl;
             }
