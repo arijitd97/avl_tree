@@ -122,7 +122,7 @@ class AVL{
         return plr; 
     }
 
-    struct node* insert(struct node *root,int data){
+    struct node* insertNode(struct node *root,int data){
         
         if(!root){
             struct node *n = new struct node;
@@ -134,9 +134,9 @@ class AVL{
         }
         else{
             if(data < root->data)
-            root->left = insert(root->left,data);
+            root->left = insertNode(root->left,data);
             else
-            root->right = insert(root->right,data);
+            root->right = insertNode(root->right,data);
         }
 
         root->height = findHeight(root);
@@ -158,44 +158,6 @@ class AVL{
 
     }
 
-    void printTree(){
-        if (this->root == NULL){
-            cout<<"\n"<<"Empty tree"<<"\n";
-            return;            
-        }
-        printTree(this->root);
-    }
-
-    void printTree(struct node *v){
-        queue <struct node *> q;
-        struct node *curr;
-        q.push(v);
-        q.push(NULL);      
-
-        while(!q.empty()){
-            curr = q.front();
-            q.pop();
-            if(!curr && q.size()!=0){
-                cout<<"\n";
-                
-                q.push(NULL);
-                continue;
-            }
-            if(curr){
-                cout<<" "<<curr->data;
-
-                if (curr->left){
-                q.push(curr->left);
-                }
-                if (curr->right){
-                    q.push(curr->right);
-                }
-            }
-            
-            
-        }
-    }
- 
     struct node * deleteNode(struct node *root,int data){
         if(!root->left && !root->right){
             if(root==this->root)
@@ -251,6 +213,39 @@ class AVL{
         return root;    
     }
 
+    void printTree(){
+        if (this->root == NULL){
+            cout<<"\n"<<"Empty tree"<<"\n";
+            return;            
+        }
+        // printTree(this->root);
+        queue <struct node *> q;
+        struct node *curr;
+        q.push(this->root);
+        q.push(NULL);      
+
+        while(!q.empty()){
+            curr = q.front();
+            q.pop();
+            if(!curr && q.size()!=0){
+                cout<<"\n";
+                
+                q.push(NULL);
+                continue;
+            }
+            if(curr){
+                cout<<" "<<curr->data;
+
+                if (curr->left){
+                q.push(curr->left);
+                }
+                if (curr->right){
+                    q.push(curr->right);
+                }
+            }
+        }
+    }
+
     struct node* searchNode(struct node* root, int data){
         if(!root) return NULL;
         if(data>root->data) return searchNode(root->right, data);
@@ -303,7 +298,7 @@ void operations(char* comm, int key1, int key2, AVL *obj, std::ofstream& outputf
     string command = comm;
     if (command.compare("Insert") == 0){
         cout<<"Insert "<<key1<<endl;
-        obj->root = obj->insert(obj->root,key1);
+        obj->root = obj->insertNode(obj->root,key1);
     }
     else if (command.compare("Delete") == 0){
         cout<<"Delete "<<key1<<endl;
