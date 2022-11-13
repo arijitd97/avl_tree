@@ -8,7 +8,7 @@
 
 using namespace std;
 
-struct node{
+struct node{                            // Type of each node of the tree
     int data;
     int height;
     struct node* left;
@@ -22,7 +22,7 @@ class AVL{
         this->root=NULL;
     }
 
-    int findHeight(struct node *root){      //gives the height of a node in the tree
+    int findHeight(struct node *root){      // Returns the height of a node in the tree
             if(root->left && root->right){
                 if (root->left->height < root->right->height)
                     return root->right->height + 1;
@@ -37,7 +37,7 @@ class AVL{
             else return 1;
     }
 
-    int balFactor(struct node *root){       //gives the balance factor of a node in the tree
+    int balFactor(struct node *root){       // Returns the balance factor of a node in the tree
         if(!root) return 0;
         if(root->left && root->right){
             return root->left->height - root->right->height; 
@@ -51,7 +51,7 @@ class AVL{
         else return 0;
     }
 
-    struct node * llRotation(struct node *root){
+    struct node * llRotation(struct node *root){    // Performs a LL Rotation at the input node
         struct node *p;
         struct node *pl;
 
@@ -66,7 +66,7 @@ class AVL{
     }
 
 
-    struct node * rrRotation(struct node *root){
+    struct node * rrRotation(struct node *root){    // Performs a RR Rotation at the input node
         struct node *p;
         struct node *pr;
 
@@ -82,7 +82,7 @@ class AVL{
     }
 
 
-    struct node * rlRotation(struct node *root){
+    struct node * rlRotation(struct node *root){    // Performs a RL Rotation at the input node
         struct node *p;
         struct node *pr;
         struct node *prl;
@@ -102,7 +102,7 @@ class AVL{
         return prl; 
     }
 
-    struct node * lrRotation(struct node *root){
+    struct node * lrRotation(struct node *root){    // Performs a LR Rotation at the input node
         struct node *p;
         struct node *pl;
         struct node *plr;
@@ -122,7 +122,7 @@ class AVL{
         return plr; 
     }
 
-    struct node* insertNode(struct node *root,int data){
+    struct node* insertNode(struct node *root,int data){    // Inserts a new node in the tree with key as the input data
         
         if(!root){
             struct node *n = new struct node;
@@ -158,7 +158,7 @@ class AVL{
 
     }
 
-    struct node * deleteNode(struct node *root,int data){
+    struct node * deleteNode(struct node *root,int data){      // Deletes a node from the tree having the given key value
         if(!root->left && !root->right){
             if(root==this->root)
                 this->root = NULL;
@@ -166,8 +166,7 @@ class AVL{
             return NULL;
         }
 
-        struct node *t;
-        struct node *q;
+        struct node *temp;
         if(data > root->data){
             root->right = deleteNode(root->right,data);
         }
@@ -176,14 +175,14 @@ class AVL{
         }
         else{
             if(root->left){
-                q = inorderPred(root->left);
-                root->data = q->data;
-                root->left=deleteNode(root->left,q->data);
+                temp = inorderPred(root->left);
+                root->data = temp->data;
+                root->left=deleteNode(root->left,temp->data);
             }
             else{
-                q = inorderSucc(root->right);
-                root->data = q->data;
-                root->right = deleteNode(root->right,q->data);
+                temp = inorderSucc(root->right);
+                root->data = temp->data;
+                root->right = deleteNode(root->right,temp->data);
             }
         }
 
@@ -199,26 +198,25 @@ class AVL{
         return root;
     }
 
-    struct node* inorderPred(struct node* root){
+    struct node* inorderPred(struct node* root){        // Returns the rightmost node of the left subtree of the input node
         while(root->right!=NULL)
             root = root->right;
 
         return root;    
     }
 
-    struct node* inorderSucc(struct node* root){
+    struct node* inorderSucc(struct node* root){        // Returns the leftmost node of the right subtree of the input node
         while(root->left!=NULL)
             root = root->left;
 
         return root;    
     }
 
-    void printTree(){
+    void printTree(){                   // Prints the tree in level order
         if (this->root == NULL){
             cout<<"\n"<<"Empty tree"<<"\n";
             return;            
         }
-        // printTree(this->root);
         queue <struct node *> q;
         struct node *curr;
         q.push(this->root);
@@ -246,7 +244,7 @@ class AVL{
         }
     }
 
-    struct node* searchNode(struct node* root, int data){
+    struct node* searchNode(struct node* root, int data){   // Search the node in the tree with the given key value
         if(!root) return NULL;
         if(data>root->data) return searchNode(root->right, data);
         else if(data<root->data) return searchNode(root->left, data);
@@ -255,7 +253,7 @@ class AVL{
         return root;    
     }
 
-    void searchNode(struct node* root, int start, int end, vector<struct node*>& nodes){
+    void searchNode(struct node* root, int start, int end, vector<struct node*>& nodes){    // Creates a list of nodes with key values within the input range [start,end]
         if(!root || start>end) return;
         if(root->data>start) searchNode(root->left,start,end,nodes);
         if(root->data>=start && root->data<=end){
