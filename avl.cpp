@@ -26,28 +26,29 @@ class AVL{
             if(root->left && root->right){
                 if (root->left->height < root->right->height)
                     return root->right->height + 1;
+
                 else return  root->left->height + 1;
             }
-            else if(root->left && !root->right){
+            else if(root->left && !root->right)
                return root->left->height + 1;
-            }
-            else if(!root->left && root->right){
+
+            else if(!root->left && root->right)
                return root->right->height + 1;
-            }
+
             else return 1;
     }
 
     int balFactor(struct node *root){       // Returns the balance factor of a node in the tree
         if(!root) return 0;
-        if(root->left && root->right){
+        if(root->left && root->right)
             return root->left->height - root->right->height; 
-        }
-        else if(root->left && !root->right){
+
+        else if(root->left && !root->right)
             return root->left->height; 
-        }
-        else if(!root->left && root->right ){
+
+        else if(!root->left && root->right )
             return -1 * root->right->height;
-        }
+
         else return 0;
     }
 
@@ -141,18 +142,17 @@ class AVL{
 
         root->height = findHeight(root);
 
-        if(balFactor(root)==2 && balFactor(root->left)==1){
+        if(balFactor(root)==2 && balFactor(root->left)==1)
             root = llRotation(root);
-        }
-        else if(balFactor(root)==-2 && balFactor(root->right)==-1){
+
+        else if(balFactor(root)==-2 && balFactor(root->right)==-1)
             root = rrRotation(root);
-        }
-        else if(balFactor(root)==-2 && balFactor(root->right)==1){
+
+        else if(balFactor(root)==-2 && balFactor(root->right)==1)
             root = rlRotation(root);
-        }
-        else if(balFactor(root)==2 && balFactor(root->left)==-1){
+            
+        else if(balFactor(root)==2 && balFactor(root->left)==-1)
             root = lrRotation(root);
-        }        
 
         return root;
 
@@ -188,25 +188,36 @@ class AVL{
 
         root->height=findHeight(root);
 
-        if(balFactor(root)==2 && balFactor(root->left)==1){ root = llRotation(root); }                  
-        else if(balFactor(root)==2 && balFactor(root->left)==-1){ root = lrRotation(root); }
-        else if(balFactor(root)==2 && balFactor(root->left)==0){ root = llRotation(root); }
-        else if(balFactor(root)==-2 && balFactor(root->right)==1){ root = rrRotation(root); }
-        else if(balFactor(root)==-2 && balFactor(root->right)==-1){ root = rlRotation(root); }
-        else if(balFactor(root)==-2 && balFactor(root->right)==0){ root = rrRotation(root); }
+        if(balFactor(root)==2 && balFactor(root->left)==1) 
+            root = llRotation(root);
+
+        else if(balFactor(root)==2 && balFactor(root->left)==0) 
+            root = llRotation(root);      
+
+        else if(balFactor(root)==2 && balFactor(root->left)==-1) 
+            root = lrRotation(root);
+
+        else if(balFactor(root)==-2 && balFactor(root->right)==1) 
+            root = rrRotation(root);
+
+        else if(balFactor(root)==-2 && balFactor(root->right)==0) 
+            root = rrRotation(root);
+
+        else if(balFactor(root)==-2 && balFactor(root->right)==-1) 
+            root = rlRotation(root);
         
         return root;
     }
 
     struct node* inorderPred(struct node* root){        // Returns the rightmost node of the left subtree of the input node
-        while(root->right!=NULL)
+        while(root->right)
             root = root->right;
 
         return root;    
     }
 
     struct node* inorderSucc(struct node* root){        // Returns the leftmost node of the right subtree of the input node
-        while(root->left!=NULL)
+        while(root->left)
             root = root->left;
 
         return root;    
@@ -226,7 +237,7 @@ class AVL{
             curr = q.front();
             q.pop();
             if(!curr && q.size()!=0){
-                cout<<"\n";
+                cout<<endl;
                 
                 q.push(NULL);
                 continue;
@@ -249,8 +260,6 @@ class AVL{
         if(data>root->data) return searchNode(root->right, data);
         else if(data<root->data) return searchNode(root->left, data);
         else return root;
-
-        return root;    
     }
 
     void searchNode(struct node* root, int start, int end, vector<struct node*>& nodes){    // Creates a list of nodes with key values within the input range [start,end]
@@ -269,30 +278,31 @@ class AVL{
 };
 
 
-void searchTwoKey(int start, int end, AVL *obj, std::ofstream& outputfile){
+void searchTwoKey(int start, int end, AVL *obj, std::ofstream& outputfile){     // Called when the operation is search keys withn a range
     printf("Search range %d %d\n", start, end);
     vector<struct node *> nodes;
     obj->searchNode(obj->root,start,end,nodes);
 
     if (outputfile.is_open()){
         if (nodes.size() == 0) {
-            outputfile << "NULL";
+            outputfile<<"NULL";
+            cout<<"NULL"<<endl;
         }
         else{
             cout<<"Result - ";
             for(int i = 0; i < nodes.size(); i++){
                 cout<<nodes[i]->data<<" ";
-                outputfile << nodes[i]->data;
-                if (i < nodes.size()-1) {outputfile<<',';}
+                outputfile<<nodes[i]->data;
+                if (i < nodes.size()-1) outputfile<<',';
             }
             cout<<endl;
         }
         outputfile<<endl;
     }
-    else cout << "Unable to open output file";
+    else cout<<"Unable to open output file";
 }
 
-void operations(char* comm, int key1, int key2, AVL *obj, std::ofstream& outputfile){
+void operations(char* comm, int key1, int key2, AVL *obj, std::ofstream& outputfile){       // Called when insert, delete and search operation is used
     string command = comm;
     if (command.compare("Insert") == 0){
         cout<<"Insert "<<key1<<endl;
@@ -363,7 +373,7 @@ int main(int argc, char **argv){
         
     }
     else {
-        std::cout << "Unable to open input file"<<endl;
+        std::cout<<"Unable to open input file"<<endl;
     }
     outputfile.close();
 }
